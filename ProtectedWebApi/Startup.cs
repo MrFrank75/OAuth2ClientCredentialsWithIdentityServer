@@ -38,13 +38,15 @@ namespace ProtectedWebApi
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+            app.UseStatusCodePages();
+
             app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
             {
                 Authority = "http://localhost:50150",
                 RequireHttpsMetadata = false,
                 ApiName = "SuperSecureWebAPI"
             });
-
+             
             app.UseMvc(routes =>
            {
                routes.MapRoute(
