@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+
 namespace ProtectedWebApi
 {
     public class Startup
@@ -36,6 +37,13 @@ namespace ProtectedWebApi
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+
+            app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
+            {
+                Authority = "http://localhost:50150",
+                RequireHttpsMetadata = false,
+                ApiName = "SuperSecureWebAPI"
+            });
 
             app.UseMvc(routes =>
            {
