@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -12,12 +13,34 @@ namespace ConsoleClient
     {
         static void Main(string[] args)
         {
+            AuthorizationServerAnswer authorizationServerToken;
+            JwtSecurityToken jwtSecurityToken;
+
             string tokenResult = GetHttpResponseAsync(new Uri("http://localhost:50151/connect/token"), "ClientIdThatCanOnlyRead", "scope.readaccess", "secret1")
                 .GetAwaiter()
                 .GetResult();
+            authorizationServerToken = Newtonsoft.Json.JsonConvert.DeserializeObject<AuthorizationServerAnswer>(tokenResult);
+            
+
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+            jwtSecurityToken = jwtTokenHandler.ReadJwtToken(authorizationServerToken.access_token);
 
             Console.WriteLine("Token acquired from Authorization Server:");
             Console.WriteLine(tokenResult);
+
+            HttpResponseMessage responseMessage;
+
+            using (HttpClient httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authorizationServerToken.access_token);
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "http://localhost:50150/api/values");
+                responseMessage  = httpClient.SendAsync(request).GetAwaiter().GetResult();
+            }
+
+            Console.WriteLine("Reponse received:");
+            string task = responseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+            Console.WriteLine(task);
             Console.ReadKey();
         }
 

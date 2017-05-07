@@ -42,9 +42,9 @@ namespace ProtectedWebApi
 
             app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
             {
-                Authority = "http://localhost:50150",
+                Authority = "http://localhost:50151",
                 RequireHttpsMetadata = false,
-                ApiName = "SuperSecureWebAPI"
+                ApiName = "scope.readaccess"
             });
              
             app.UseMvc(routes =>
